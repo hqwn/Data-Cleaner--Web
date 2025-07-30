@@ -1,3 +1,4 @@
+
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -205,6 +206,15 @@ def kinda_main():
                                 df = df[df[li] < k]
                         st.session_state.show = df.copy()
                         st.rerun()
+                with st.expander('Capitialize Columns'):
+                    column_names = df.columns.tolist()
+                    luffy = st.multiselect('Pick columns to capitalize', column_names)
+                    if luffy and luffy != st.session_state.widgets[12]:
+                        st.session_state.widgets[12] = luffy
+                        for i in luffy:
+                            df[i] = df[i].str.lower().str.capitalize()
+                        st.session_state.show = df
+                        st.rerun()
                 col0,col11 = st.columns(2)
                 summarize = col1.checkbox('')
                 check = col0.checkbox('Drop Duplicate Rows')
@@ -213,6 +223,7 @@ def kinda_main():
                     df = df.drop_duplicates()
                     st.session_state.show = df
                     st.rerun()
+        
                 
 
 
@@ -232,27 +243,28 @@ def kinda_main():
         st.session_state.widgets = [0, [0, row], '', '', [],[],[],[],[],[],[],'', '']
 
     #buttons
-    df = tab1.data_editor(st.session_state.show, num_rows="dynamic")
-    tab2.data_editor(df.describe(include='all'))
-    if st.button('Commit'):
+    cola,colb,colc,cold = st.columns([1,2,1,2])
+    if cola.button('Commit'):
         column_names = df.columns.tolist()
         st.session_state.commit = st.session_state.show.copy()
         df = st.session_state.commit.copy()
         st.rerun()
     
-    if st.button('Undo To last Commit'):
+    if colb.button('Undo To last Commit'):
         st.session_state.show = st.session_state.commit.copy()
         df = st.session_state.commit.copy()
         st.rerun()
 
-    if st.button('Reset all'):
+    if colc.button('Reset all'):
         st.session_state.commit = st.session_state.og.copy()
         st.session_state.show = st.session_state.og.copy()
         df = st.session_state.og.copy()
         st.rerun()
     csv = df.to_csv(index=False).encode('utf-8')
-    if st.download_button(label="Download Cleaned CSV",data=csv,file_name='cleaned_data.csv',mime='text/csv'):
+    if cold.download_button(label="Download Cleaned CSV",data=csv,file_name='cleaned_data.csv',mime='text/csv'):
          st.balloons()
+    df = tab1.data_editor(st.session_state.show, num_rows="dynamic")
+    tab2.data_editor(df.describe(include='all'))
     #Running everything
     sidebar(df)
 
