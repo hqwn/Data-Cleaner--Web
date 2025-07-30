@@ -216,7 +216,6 @@ def kinda_main():
                         st.session_state.show = df
                         st.rerun()
                 col0,col11 = st.columns(2)
-                summarize = col1.checkbox('')
                 check = col0.checkbox('Drop Duplicate Rows')
                 if check and st.session_state.widgets[11] != check:
                     st.session_state.widgets[11] = check
