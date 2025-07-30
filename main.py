@@ -276,6 +276,36 @@ st.markdown(
      unsafe_allow_html=True
  )
 
+
+st.markdown(
+    """
+    <style>
+    .yt-float {
+        position: fixed;
+        bottom: 15px;
+        right: 15px;
+        background-color: #FF0000;
+        color: white;
+        padding: 10px 16px;
+        border-radius: 30px;
+        text-align: center;
+        font-weight: bold;
+        box-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+        transition: 0.3s ease;
+        z-index: 9999;
+    }
+    .yt-float:hover {
+        background-color: #CC0000;
+        text-decoration: none;
+    }
+    </style>
+
+    <a href="https://www.youtube.com/watch?v=9zrbpNRHqqA" target="_blank" class="yt-float">
+        📺 How to Use Amai
+    </a>
+    """,
+    unsafe_allow_html=True
+)
 #File
 file = st.file_uploader("Please Upload A Csv/Xlsx File", type=['xlsx', 'csv'])
 
