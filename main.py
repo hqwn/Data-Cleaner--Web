@@ -1,133 +1,275 @@
-#Imports needed
 import streamlit as st
 import pandas as pd
+import numpy as np
+
+def kinda_main():
+    #file reading logic
+    @st.cache_data
+    def read_file(file):
+        if '.xlsx' in file.name:
+            return pd.read_excel(file)
+        else:
+            return pd.read_csv(file)
 
 
 
 
+    def sidebar(df):
+        #SideBar Full of customiziation
+
+        with st.sidebar:
+
+            #Column Modification
+            #Will have Random Variable names for expanders
+
+            #Sidebar Title
+            st.title("Customize Your Data")
+            #Data Column names and column/row info
+            column_names = df.columns.tolist()
 
 
-#Main Code
-def main(df, DP_Rows,n_df,Preview,Suffix,Prefix):
-    #drops duplicates
-    df = df.drop_duplicates()
+            #picking Value to Show
+            a = st.expander("Pick Values To Show")
+            
+            with a:
+                x = row
+                st.title('You can only pick one to reset (1 one should be 0, and the second one should be 0,800)')
+                Top_x = st.slider('Pick x Amount of Values To Use', 0, row)
+                st.divider()
+                x_x = st.slider('Pick X through X Values To Use',0,row,(0,row))
+                st.divider()
+                #Logic
+                if Top_x > 0 and x_x == (0,row) and Top_x != st.session_state.widgets[0]:
+                    st.session_state.widgets[0] = Top_x
+                    df = df.head(Top_x)
+                    st.session_state.show = df
+                    st.rerun()
+
+                    
+                elif Top_x == 0 and x_x != (0,row) and x_x != st.session_state.widgets[1]:
+                    st.session_state.widgets[1] = x_x
+                    x = row
+                    a,b = x_x[0], x_x[1]
+                    df = df[a:b]
+                    st.session_state.show = df
+                    st.rerun()
+
+            #Modifiying columns
+            b = st.expander('Column Modification')
+            with b:
+                #Renaming Column
+                c = st.expander('Rename Column')
+                with c:
+                    column = st.selectbox('Pick Your Column To Rename', column_names)
+                    new_name = st.text_area('New Name For Column')
+
+                    if column and new_name and column != st.session_state.widgets[2] and new_name != st.session_state.widgets[3]:
+                        st.session_state.widgets[2] = column
+                        st.session_state.widgets[3] = row
+                        df = df.rename(columns={column: new_name})
+                        st.session_state.show = df.copy()
+                        st.rerun()
+
+                #New Column With Function
+                New_Col = st.expander('Make new Column With Function')
+                column_names = df.columns.tolist()
+                with New_Col:
+                    col1,col2,col3 = st.columns(3)
+                    p = col1.selectbox('X Column', column_names)
+                    times = col2.selectbox('X', ['x','+', '-', '/'])
+                    p2 = col3.selectbox('X Column', column_names, key='s')
+                    nam = st.text_input('Name Of New Column')
+                    if p and times and p2 and nam and [p,times,p2, nam] != st.session_state.widgets[5]:
+                        st.session_state.widgets[5] = [p,times,p2,nam]
+                        match times:
+                            case 'x':
+                                df[nam] = df[p] * df[p2]
+                            case '+':
+                                df[nam] = df[p] + df[p2]
+                            case '-':
+                                df[nam] = df[p] - df[p2]
+                            case '/':
+                                df[nam] = df[p] / df[p2]
+                        st.session_state.show = df.copy()
+                        st.rerun()
+
+                #Dropping columns
+                op = st.expander("Drop Columns")
+                with op:
+                    column_names = df.columns.tolist()
+                    Drop_Col = st.multiselect("Columns To Drop", column_names)
+
+                    if Drop_Col and Drop_Col != st.session_state.widgets[4]:
+                        st.session_state.widgets[4] = Drop_Col
+                        df = df.drop(columns=Drop_Col)
+                        st.session_state.show = df
+                        st.rerun()
+                
+                with st.expander('Add Suffix/Prefix'):
+                    column_names = df.columns.tolist()
+                    columnss = st.multiselect('Pick Columns', column_names)
+                    Suffix = st.text_input('Suffix')
+                    Prefix = st.text_input('Prefix')
+                    col4,col5 = st.columns(2)
+                    remove = col4.button('Remove')
+                    add = col5.button('Add')
+                    
+                    if add and remove:
+                        st.toast('Please Pick One checkbox At A Time')
+                    elif add or remove:
+                        if Suffix or Prefix and columnss and [Suffix,Prefix,columnss,add,remove] != st.session_state.widgets[9]:
+                            st.session_state.widgets[9] = [Suffix,Prefix,columnss,add,remove]
+                            if add:
+                                for i in columnss:
+                                        if Prefix:
+                                           df[i] = Prefix + df[i].astype(str) 
+                                        if Suffix:
+                                            df[i] = df[i].astype(str) + Suffix
+                            if remove:
+                                for i in columnss:
+                                    if Prefix:
+                                        df[i] = df[i].astype(str).str.removeprefix(Prefix)
+                                    if Suffix:
+                                        df[i] = df[i].astype(str).str.removesuffix(Suffix)
+                            st.session_state.show = df.copy()
+                            st.rerun()
+
+
+                    
+
+            with st.expander('Missing Values Modification'):
+                #To modify missing values like replacing empty values
+
+                with st.expander("Replace Empty Values In Columns"):
+                    column_names = df.columns.tolist()
+                    value = st.text_input('Value')
+                    multi = st.multiselect('Columns', column_names)
+
+                    if value and multi and [value, multi] != st.session_state.widgets[6]:
+                        st.session_state.widgets[6] = [value, multi]
+                        for i in multi:
+                            df[i].replace('', np.nan, inplace=True)
+                            df[i].fillna(value, inplace=True)
+                            st.session_state.show = df
+                            st.rerun()
+                
+                with st.expander('Remove columns/rows with missing values'):
+                    c1 = st.checkbox('Remove Rows With Missing Value')
+                    c2 = st.checkbox('Remove Columns With Missing Value')
+                    
+                    if c2 and c1:
+                        st.toast('You can only have one checkbox picked at once')
+                    elif c1 or c2:
+                        if [c1,c2] != st.session_state.widgets[7]:
+                            st.session_state.widgets[7] = [c1,c2]
+                            if c1:
+                                df = df.dropna()
+                                st.session_state.show = df.copy()
+                                st.rerun()
+
+                            if c2:
+                                df = df.dropna(axis=1)
+                                st.session_state.show = df.copy()
+                                st.rerun()
+            with st.expander('Sorting'):
+                #sorting
+                column_names = df.columns.tolist()
+                lis = st.selectbox('Pick Column To Sort With', column_names)
+                c3 = st.checkbox('Ascending')
+                c4 = st.checkbox('Descending')
+                if c3 and c4:
+                    st.toast('Only pick one checkbox at once')
+                elif (lis,c3,c4) != st.session_state.widgets[8]:
+                    st.session_state.widgets[8] = (lis,c3,c4)
+                    if c3:
+                        df = df.sort_values(by=lis)
+                        st.session_state.show = df.copy()
+                        st.rerun()
+                    if c4:
+                        df = df.sort_values(by=lis, ascending=False)
+                        st.session_state.show = df.copy()
+                        st.rerun()
+            with st.expander('Extras'):
+                with st.expander('Filter (Only With Numbers)'):
+                    column_names = df.columns.tolist()
+                    li = st.selectbox('Select Column To Filter With', column_names)
+                    col6,col7 = st.columns(2)
+                    j = col6.selectbox('Pick operartion', options=['>', '<'])
+                    k = col7.number_input('Pick A Number')
+                    if li and j and k and [li,j,k] != st.session_state.widgets[10]:
+                        st.session_state.widgets[10] = [li,j,k]
+                        match j:
+                            case '>':
+                                df = df[df[li] > k]
+                            case '<':
+                                df = df[df[li] < k]
+                        st.session_state.show = df.copy()
+                        st.rerun()
+                col0,col11 = st.columns(2)
+                summarize = col1.checkbox('')
+                check = col0.checkbox('Drop Duplicate Rows')
+                if check and st.session_state.widgets[11] != check:
+                    st.session_state.widgets[11] = check
+                    df = df.drop_duplicates()
+                    st.session_state.show = df
+                    st.rerun()
+                
+
+
+
+    #Reading Correct Format Of File, and initialization
+    df = read_file(file)
+    row,col = df.shape
+    tab1,tab2 = st.tabs(['Data', 'Summurized Data'])
+    #initillazing session state
+    if 'show' not in st.session_state:
+        st.session_state.show = df
+    if 'og' not in st.session_state:
+        st.session_state.og = df
+    if 'commit' not in st.session_state:
+        st.session_state.commit = df
+    if 'widgets' not in st.session_state:
+        st.session_state.widgets = [0, [0, row], '', '', [],[],[],[],[],[],[],'', '']
+
+    #buttons
+    df = tab1.data_editor(st.session_state.show, num_rows="dynamic")
+    tab2.data_editor(df.describe(include='all'))
+    if st.button('Commit'):
+        column_names = df.columns.tolist()
+        st.session_state.commit = st.session_state.show.copy()
+        df = st.session_state.commit.copy()
+        st.rerun()
     
-    #drops columns
-    if DP_Rows:
-        df = df.drop(columns=DP_Rows)
-    
-    #removes empty rows
-    if Empty_Remove:
-        df = df.dropna()
-        
-    #formats DATE
-    if Format_date:
-        for col in Format_date:
-            df[col] = pd.to_datetime(df[col], errors='coerce')
-    
-    #replaces empty values
-    if Replace_Empty:
-        df = df.fillna(Replace_Empty)
+    if st.button('Undo To last Commit'):
+        st.session_state.show = st.session_state.commit.copy()
+        df = st.session_state.commit.copy()
+        st.rerun()
 
-    #New name for x column
-    if Col_name and New_Name:
-        df = df.rename(columns={Col_name: New_Name})
-
-    #Capitalizes String
-    if capital:
-        for i in capital:
-            df[i] = df[i].str.lower().str.capitalize()
-    
-    #Resets DataFrame To original
-    if Reset:
-        df = st.session_state.og
-        st.session_state.df = df
-    
-    #Suffix/Prefix logic
-    if Suffix and Prefix and n_df or Preview:
-        try:
-            if Suffix == 'Add':
-                for i in Prefix:
-                    if Preview:
-                        df[i] = Preview + df[i].astype(str) 
-                    if n_df:
-                        df[i] = df[i].astype(str) + n_df
-            elif Suffix == 'Remove':
-                for i in Prefix:
-                    if Preview:
-                        df[i] = df[i].astype(str).str.removeprefix(Preview)
-                    if n_df:
-                        df[i] = df[i].astype(str).str.removeprefix(n_df)
-        except:
-            st.warning('If removing, make sure prefix/suffix exist, otherwise there has been a problem, try again')
-    
-    #download for new_df and etc..
-    st.session_state.df=df
-    Preview = st.write('preview data')
-    n_df =st.dataframe(df)
+    if st.button('Reset all'):
+        st.session_state.commit = st.session_state.og.copy()
+        st.session_state.show = st.session_state.og.copy()
+        df = st.session_state.og.copy()
+        st.rerun()
     csv = df.to_csv(index=False).encode('utf-8')
     if st.download_button(label="Download Cleaned CSV",data=csv,file_name='cleaned_data.csv',mime='text/csv'):
-        st.balloons()
+         st.balloons()
+    #Running everything
+    sidebar(df)
+
 
 #Title
 st.markdown(
-    """
-    <h1 style='text-align: center;'>Amai 👌👌</h1>
-    """,
-    unsafe_allow_html=True
-)
+     """
+     <h1 style='text-align: center;'>Amai 👌👌</h1>
+     """,
+     unsafe_allow_html=True
+ )
 
-
-#Extra Space
-st.write(" ")
-st.write(" ")
-file = st.file_uploader("Upload A Csv/Xlsx File 😁", type=['xlsx', 'csv'])
+#File
+file = st.file_uploader("Please Upload A Csv/Xlsx File", type=['xlsx', 'csv'])
 
 #Start Logic
 if file:
-    try:
-        if '.xlsx' in file.name:
-            df = pd.read_excel(file)
-        else:
-            df = pd.read_csv(file)
-
-
-        if "df" not in st.session_state:
-            st.session_state.df = df
-        if 'og' not in st.session_state:
-            st.session_state.og = df
-
-        df = st.session_state.df
-        og = st.session_state.og
-        expand = st.expander("Edit Data (Do It)", icon=":material/info:")
-        with expand:
-            #All customization widgets
-            col1, col2, col3 = st.columns([3,2,2])
-            column_names = df.columns.tolist()
-            og = og.columns.to_list()
-            Drop_Col = col1.multiselect("Drop Columns", column_names)
-            Empty_Remove = col3.checkbox("Remove Rows with missing value")
-            Format_date = col2.multiselect("Format Date of x column", column_names)
-            Replace_Empty = col1.text_input('Fill Missing values with .....')
-            column_rename = col2.expander('Rename Column')
-            Col_name = column_rename.selectbox("Change Column x's name", column_names)
-            New_Name = column_rename.text_input('With...')
-            capital = col3.multiselect("Capitalize string of x columns", column_names)
-            expan = st.expander('Add/Remove Suffix/Prefix')
-            with expan:
-                row1,row2=st.columns(2)
-                Suf = row1.text_input('Enter Suffix')
-                Pre = row2.text_input('Enter Prefix')
-                re_ad = row1.pills('Action', ['Remove', 'Add'])
-                col_select = row2.multiselect('Columns', column_names)
-            Reset = st.button('Reset all')
-        main(df, Drop_Col,Suf,Pre,re_ad,col_select)
-    except:
-        st.warning('Something went Wrong! Please Try Again')
+    kinda_main()
 else:
-    #Gives warning if file Empty
-    st.warning('upload a File')
-
-
-
-
+    st.warning('Please Upload A File Under 200 Mb')
