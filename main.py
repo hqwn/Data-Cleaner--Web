@@ -35,9 +35,9 @@ def kinda_main():
             with a:
                 x = row
                 st.title('You can only pick one to reset (1 one should be 0, and the second one should be 0,800)')
-                Top_x = st.slider('Pick x Amount of Values To Use', 0, st.session_state.show.shape[0])
+                Top_x = st.slider('Pick x Amount of Values To Use', 0, row)
                 st.divider()
-                x_x = st.slider('Pick X through X Values To Use',0,st.session_state.show.shape[0],(0,st.session_state.show.shape[0]))
+                x_x = st.slider('Pick X through X Values To Use',0,row,(0,row))
                 st.divider()
                 #Logic
                 if Top_x > 0 and x_x == (0,row) and Top_x != st.session_state.widgets[0]:
