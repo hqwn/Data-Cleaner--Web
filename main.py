@@ -284,7 +284,7 @@ st.markdown(
         position: fixed;
         bottom: 15px;
         right: 15px;
-        background-color: #FF0000;
+        background-color: black;
         color: white;
         padding: 10px 16px;
         border-radius: 30px;
