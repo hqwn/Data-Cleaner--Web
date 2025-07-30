@@ -224,7 +224,7 @@ def kinda_main():
                     st.session_state.show = df
                     st.rerun()
         
-            st.link_button("Learn How To Use Amai", 'https://www.youtube.com/watch?v=9zrbpNRHqqA', *, help=None, type="secondary", icon=None, disabled=False, use_container_width=False)
+            st.link_button("Learn How To Use Amai", 'https://www.youtube.com/watch?v=9zrbpNRHqqA')
     
 
 
