@@ -19,7 +19,7 @@ def kinda_main():
         #SideBar Full of customiziation
 
         with st.sidebar:
-
+            
             #Column Modification
             #Will have Random Variable names for expanders
 
@@ -134,6 +134,7 @@ def kinda_main():
                                         df[i] = df[i].astype(str).str.removesuffix(Suffix)
                             st.session_state.show = df.copy()
                             st.rerun()
+                
 
 
                     
@@ -223,7 +224,8 @@ def kinda_main():
                     st.session_state.show = df
                     st.rerun()
         
-                
+            st.link_button("Learn How To Use Amai", https://www.youtube.com/watch?v=9zrbpNRHqqA, *, help=None, type="secondary", icon=None, disabled=False, use_container_width=False)
+    
 
 
 
