@@ -280,7 +280,7 @@ def kinda_main():
                     df = df.drop_duplicates()
                     st.session_state.show = df
                     st.rerun()
-        
+        st.link_button("Learn How To Use Amai", 'https://www.youtube.com/watch?v=9zrbpNRHqqA')
                 
 
 
@@ -342,3 +342,4 @@ if file:
     kinda_main()
 else:
     st.warning('Please Upload A File Under 200 Mb')
+
