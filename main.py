@@ -1,4 +1,4 @@
-
+import random
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -19,7 +19,7 @@ def kinda_main():
         #SideBar Full of customiziation
 
         with st.sidebar:
-            
+
             #Column Modification
             #Will have Random Variable names for expanders
 
@@ -134,12 +134,11 @@ def kinda_main():
                                         df[i] = df[i].astype(str).str.removesuffix(Suffix)
                             st.session_state.show = df.copy()
                             st.rerun()
-                
 
 
                     
 
-            with st.expander('Missing Values Modification'):
+            with st.expander('Values Modification'):
                 #To modify missing values like replacing empty values
 
                 with st.expander("Replace Empty Values In Columns"):
@@ -173,6 +172,19 @@ def kinda_main():
                                 df = df.dropna(axis=1)
                                 st.session_state.show = df.copy()
                                 st.rerun()
+                with st.expander('Replace string in column with x'):
+                    column_names = df.columns.tolist()
+                    select = st.multiselect('Pick column/columns', column_names)
+                    replace = st.text_input('String To replace (Case Sensitive)')
+                    wits = st.text_input('Replace the string with')
+
+                    if select and replace and wits and [select,replace,wits] != st.session_state.widgets[14]:
+                        st.session_state.widgets[14] = [select,replace,wits]
+                        for i in select:
+                            df[i] = df[i].apply(lambda x: str(x))
+                            df[i] = df[i].apply(lambda x: x.replace(replace, wits))
+                        st.session_state.show = df
+                        st.rerun()
             with st.expander('Sorting'):
                 #sorting
                 column_names = df.columns.tolist()
@@ -191,32 +203,77 @@ def kinda_main():
                         df = df.sort_values(by=lis, ascending=False)
                         st.session_state.show = df.copy()
                         st.rerun()
+
+
+
+
+            with st.expander('Encryption For Sensetive Data'):
+                with st.expander('Shuffle Data'):
+                    pop = st.toggle('Shuffle Data')
+                    if pop and pop != st.session_state.widgets[13]:
+                        st.session_state.widgets[13] = pop
+                        for i in df.columns.tolist():
+                            df[i] = df[i].sample(frac=1, random_state=5).reset_index(drop=True)
+                        st.session_state.show = df
+                        st.rerun()
             with st.expander('Extras'):
                 with st.expander('Filter (Only With Numbers)'):
                     column_names = df.columns.tolist()
                     li = st.selectbox('Select Column To Filter With', column_names)
                     col6,col7 = st.columns(2)
-                    j = col6.selectbox('Pick operartion', options=['>', '<'])
-                    k = col7.number_input('Pick A Number')
+                    j = col6.selectbox('Pick operartion', options=['>', '<', '=', 'not = to'])
+                    k = col7.text_input('Write the comparison')
                     if li and j and k and [li,j,k] != st.session_state.widgets[10]:
                         st.session_state.widgets[10] = [li,j,k]
                         match j:
                             case '>':
+                                k = int(k)
                                 df = df[df[li] > k]
                             case '<':
+                                k = int(k)
                                 df = df[df[li] < k]
+                            case '=':
+                                try:
+                                    k = int(k)
+                                    df = df[df[li] == k]
+                                except:
+                                    k = str(k)
+                                    df = df[df[li] == k]
+                            case 'not = to':
+                                try:
+                                    k = int(k)
+                                    df = df[df[li] != k]
+                                except:
+                                    k = str(k)
+                                    df = df[df[li] != k]
+                            
                         st.session_state.show = df.copy()
                         st.rerun()
-                with st.expander('Capitialize Columns'):
+                with st.expander('Format Columns'):
                     column_names = df.columns.tolist()
-                    luffy = st.multiselect('Pick columns to capitalize', column_names)
-                    if luffy and luffy != st.session_state.widgets[12]:
-                        st.session_state.widgets[12] = luffy
+                    sanji= st.selectbox('Pick what to do', ['Capitalize', 'Phone Format', 'Remove Extra Spaces'])
+                    luffy = st.multiselect('Pick columns to format', column_names)
+                    if luffy and sanji and [luffy, sanji] != st.session_state.widgets[12]:
+                        st.session_state.widgets[12] = [luffy,sanji]
+                        print(sanji)
                         for i in luffy:
-                            df[i] = df[i].str.lower().str.capitalize()
+                            match sanji:
+                                case 'Capitalize':
+                                    df[i] = df[i].str.lower().str.capitalize()
+                                case 'Phone Format':
+                                    df[i] = df[i].apply(lambda x: str(x))
+                                    df[i] = df[i].str.replace('[a-zA-Z0-9]', '')
+                                    df[i] = df[i].apply(lambda x: x[0:3] + '-' + x[3:6] + '-' + x[6:10])
+                                    df[i] = df[i].str.replace('nan--','')
+                                    df[i] = df[i].str.replace('Na--','')
+                                    df[i] = df[i].str.replace('NaN--','')
+                                case 'Remove Extra Spaces':
+                                    df[i].apply(lambda x: str(x))
+                                    df[i] = df[i].str.strip()
                         st.session_state.show = df
                         st.rerun()
                 col0,col11 = st.columns(2)
+                summarize = col1.checkbox('')
                 check = col0.checkbox('Drop Duplicate Rows')
                 if check and st.session_state.widgets[11] != check:
                     st.session_state.widgets[11] = check
@@ -224,8 +281,7 @@ def kinda_main():
                     st.session_state.show = df
                     st.rerun()
         
-            st.link_button("Learn How To Use Amai", 'https://www.youtube.com/watch?v=9zrbpNRHqqA')
-    
+                
 
 
 
@@ -241,7 +297,7 @@ def kinda_main():
     if 'commit' not in st.session_state:
         st.session_state.commit = df
     if 'widgets' not in st.session_state:
-        st.session_state.widgets = [0, [0, row], '', '', [],[],[],[],[],[],[],'', '']
+        st.session_state.widgets = [0, [0, row], '', '', [],[],[],[],[],[],[],'', '', '', '']
 
     #buttons
     cola,colb,colc,cold = st.columns([1,2,1,2])
@@ -277,7 +333,6 @@ st.markdown(
      """,
      unsafe_allow_html=True
  )
-
 
 #File
 file = st.file_uploader("Please Upload A Csv/Xlsx File", type=['xlsx', 'csv'])
