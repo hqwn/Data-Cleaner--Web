@@ -217,7 +217,7 @@ def kinda_main():
                         st.session_state.show = df
                         st.rerun()
             with st.expander('Extras'):
-                with st.expander('Filter (Only With Numbers)'):
+                with st.expander('Filter rows'):
                     column_names = df.columns.tolist()
                     li = st.selectbox('Select Column To Filter With', column_names)
                     col6,col7 = st.columns(2)
@@ -342,5 +342,6 @@ if file:
     kinda_main()
 else:
     st.warning('Please Upload A File Under 200 Mb')
+
 
 
