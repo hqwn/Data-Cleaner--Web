@@ -319,7 +319,7 @@ def main():
                     if check([ap,bp,plot_type], 9):
                         plot(xp,yp, xl=ap, yl=bp)
                     
-           st.link_button("Learn How To Use Amai", 'https://www.youtube.com/watch?v=9zrbpNRHqqA')  
+            st.link_button("Learn How To Use Amai", 'https://www.youtube.com/watch?v=9zrbpNRHqqA')  
 
 
 
@@ -387,4 +387,5 @@ if file:
     main()
 else:
     st.warning('Please Upload A csv/xlsx File Under 200 Mb')
+
 
