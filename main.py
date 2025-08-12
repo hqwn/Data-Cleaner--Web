@@ -1,28 +1,31 @@
 
 
 #imports 
-import random
 import streamlit as st
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import plotly_express as px
-
+import io
+import msoffcrypto
 
 
 
 #Main Code/Scroll down to see start logic
 def main():
     #file reading logic
-    @st.cache_data
+    @st.cache_resource
     def read_file(file):
-        if '.xlsx' in file.name:
-            if password:     
-                return pd.read_excel(file, sheet_name='Sheet1', password=password)
+        if password and file:
+                office_file = msoffcrypto.OfficeFile(file)
+                office_file.load_key(password=password)
+                decrypted_data = io.BytesIO()
+                office_file.decrypt(decrypted_data)
+                decrypted_data.seek(0) # Reset stream position to the beginning
+                return pd.read_excel(decrypted_data)
+        elif '.xlsx' in file.name:
             return pd.read_excel(file)
         else:
-            if password:     
-                return pd.read_csv(file, sheet_name='Sheet1', password=password)
             return pd.read_csv(file)
     #Checking Logic 
     def check(lit,index):
@@ -289,35 +292,49 @@ def main():
             #Making the Plot 
             with st.expander('Plot Your Data'):
                 
-                def plot(x,y, xl='X Label',yl='Y Label'):
+                def plot(a,b,c):
                     with tab3:
-                        fig, ax = plt.subplots()
-                        match plot_type:
-                            case 'line plot':
-                                ax.plot(x,y)
-                            case 'scatter plot':
-                                ax.scatter(x,y)
-                            case 'bar chart':
-                                ax.bar(x,y)
-                            case 'Horizantal Bar Chart':
-                                ax.bar(x,y)
-                            case'Stacked Area Plot':
-                                ax.barh(x,y)
-                            case'Stem Plot':
-                                ax.stem(x,y)
-                        ax.set_xlabel(xl)
-                        ax.set_ylabel(yl)
+                        if color != 'None':
+                            match plot_type:
+                                case 'line plot':
+                                    fig = px.line(df,x=a,y=b,color = c)
+                                case 'scatter plot':
+                                    fig = px.scatter(df,x=a,y=b,color = c)
+                                case 'bar chart':
+                                    fig = px.bar(df,x=a,y=b,color = c)
+                                case 'Horizantal Bar Chart':
+                                    fig = px.bar(df,x=a,y=b,orientation='h',color = c)
+                                case'Stacked Area Plot':
+                                    fig = px.area(df,x=a,y=b,color = c)
+                        else:
+                            match plot_type:
+                                case 'line plot':
+                                    fig = px.line(df,x=a,y=b)
+                                case 'scatter plot':
+                                    fig = px.scatter(df,x=a,y=b)
+                                case 'bar chart':
+                                    fig = px.bar(df,x=a,y=b)
+                                case 'Horizantal Bar Chart':
+                                    fig = px.bar(df,x=a,y=b,orientation='h')
+                                case'Stacked Area Plot':
+                                    fig = px.area(df,x=a,y=b)
+                        fig.update_layout(
+                        title=f"{plot_type}",
+                        xaxis_title=a,
+                        yaxis_title=b,
+                        legend_title= plot_type
+                        )
                         st.plotly_chart(fig)
                         
-                plot_type = st.selectbox('Selct The Type Of Chart You Want', ['line plot', 'scatter plot', 'bar chart', 'Horizantal Bar Chart', 'Stacked Area Plot', 'Stem Plot'])
+                plot_type = st.selectbox('Selct The Type Of Chart You Want', ['line plot', 'scatter plot', 'bar chart', 'Horizantal Bar Chart', 'Stacked Area Plot'])
+                column_names = df.columns.tolist()
+                color = st.selectbox('Selct The Axis To be The Label/color', ['None'] + column_names)
                 with st.expander('Plot with two columns'):
                     column_names = df.columns.tolist()
                     ap = st.selectbox('Pick x', column_names)
                     bp = st.selectbox('Pick y', column_names)
-                    xp = df[ap]
-                    yp = df[bp]
-                    if check([ap,bp,plot_type], 9):
-                        plot(xp,yp, xl=ap, yl=bp)
+                    if check([ap,bp,plot_type,color], 9):
+                        plot(ap,bp,color)
                     
             st.link_button("Learn How To Use Amai", 'https://www.youtube.com/watch?v=9zrbpNRHqqA')  
 
@@ -360,6 +377,10 @@ def main():
     csv = df.to_csv(index=False).encode('utf-8')
     if cold.download_button(label="Download Cleaned CSV",data=csv,file_name='cleaned_data.csv',mime='text/csv'):
          st.balloons()
+    if st.button('Clear Cache(RECOMENDED TO USE RIGHT BEFORE EXITING)'):
+        st.cache_data.clear()
+        st.cache_resource.clear()
+        st.rerun()
     df = tab1.data_editor(st.session_state.show, num_rows="dynamic")
     tab2.data_editor(df.describe(include='all'))
     #Running everything
@@ -382,10 +403,10 @@ st.markdown(
 
 #Start Logic
 file = st.file_uploader("Please Upload A Csv/Xlsx File", type=['xlsx', 'csv'])
-password = st.text_input('Please Write Your Password If Your File Has A password')
+password = st.text_input('Please Write Your Password If Your File Has A password', type='password', key='password_input')
 if file:
     main()
 else:
     st.warning('Please Upload A csv/xlsx File Under 200 Mb')
-
+    st.stop()
 
