@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import plotly_express as px
 import io
 import msoffcrypto
-
+import duckdb as db
 
 
 #Main Code/Scroll down to see start logic
@@ -237,25 +237,19 @@ def main():
                     if check([li,j,k], 6):
                         match j:
                             case '>':
-                                k = int(k)
-                                df = df[df[li] > k]
+                                df = con.sql(f'''Select * From df WHERE {li}>{int(k)}''')           
                             case '<':
-                                k = int(k)
-                                df = df[df[li] < k]
+                                df = con.sql(f'''Select * From df WHERE {li}<{int(k)}''') 
                             case '=':
                                 try:
-                                    k = int(k)
-                                    df = df[df[li] == k]
+                                    df = con.sql(f'''Select * From df WHERE {li}={int(k)}''') 
                                 except:
-                                    k = str(k)
-                                    df = df[df[li] == k]
+                                    df = con.sql(f'''Select * From df WHERE {li}={str(k)}''') 
                             case 'not = to':
                                 try:
-                                    k = int(k)
-                                    df = df[df[li] != k]
+                                    df = con.sql(f'''Select * From df WHERE {li}!={int(k)}''') 
                                 except:
-                                    k = str(k)
-                                    df = df[df[li] != k]
+                                    df = con.sql(f'''Select * From df WHERE {li}!={str(k)}''') 
                             
                         update(df)
                 with st.expander('Format Columns'):
@@ -296,28 +290,45 @@ def main():
                     with tab3:
                         if color != 'None':
                             match plot_type:
-                                case 'line plot':
+                                case 'line plot (2d)':
                                     fig = px.line(df,x=a,y=b,color = c)
-                                case 'scatter plot':
+                                case 'scatter plot (2d)':
                                     fig = px.scatter(df,x=a,y=b,color = c)
-                                case 'bar chart':
+                                case 'bar chart (2d)':
                                     fig = px.bar(df,x=a,y=b,color = c)
-                                case 'Horizantal Bar Chart':
+                                case 'Horizantal Bar Chart (2d)':
                                     fig = px.bar(df,x=a,y=b,orientation='h',color = c)
-                                case'Stacked Area Plot':
+                                case'Stacked Area Plot (2d)':
                                     fig = px.area(df,x=a,y=b,color = c)
+                                case 'Histogram Plot (1d)':
+                                    fig = px.histogram(df, x=a,color=c)
+                                case 'Box Plot (1d)':
+                                    fig = px.box(df, x=a,color=c)
+                                case 'Map Plot':
+                                    df[a] = df[a].apply(lambda x: float(x))
+                                    df[b] = df[b].apply(lambda x: float(x))
+                                    fig = px.scatter_map(df,lat=a,lon=b,zoom=1,color=c)
+
                         else:
                             match plot_type:
-                                case 'line plot':
+                                case 'line plot (2d)':
                                     fig = px.line(df,x=a,y=b)
-                                case 'scatter plot':
+                                case 'scatter plot (2d)':
                                     fig = px.scatter(df,x=a,y=b)
-                                case 'bar chart':
+                                case 'bar chart (2d)':
                                     fig = px.bar(df,x=a,y=b)
-                                case 'Horizantal Bar Chart':
+                                case 'Horizantal Bar Chart (2d)':
                                     fig = px.bar(df,x=a,y=b,orientation='h')
-                                case'Stacked Area Plot':
+                                case'Stacked Area Plot (2d)':
                                     fig = px.area(df,x=a,y=b)
+                                case 'Histogram Plot (1d)':
+                                    fig = px.histogram(df, x=a)
+                                case 'Box Plot (1d)':
+                                    fig = px.box(df, x=a)
+                                case 'Map Plot':
+                                    df[a] = df[a].apply(lambda x: float(x))
+                                    df[b] = df[b].apply(lambda x: float(x))
+                                    fig = px.scatter_map(df,lat=a,lon=b,zoom=1)
                         fig.update_layout(
                         title=f"{plot_type}",
                         xaxis_title=a,
@@ -326,15 +337,34 @@ def main():
                         )
                         st.plotly_chart(fig)
                         
-                plot_type = st.selectbox('Selct The Type Of Chart You Want', ['line plot', 'scatter plot', 'bar chart', 'Horizantal Bar Chart', 'Stacked Area Plot'])
+                plot_type = st.selectbox('Selct The Type Of Chart You Want', ['line plot (2d)', 'scatter plot (2d)', 'bar chart (2d)', 'Horizantal Bar Chart (2d)', 'Stacked Area Plot (2d)', 'Histogram Plot (1d)', 'Box Plot (1d)', 'Map Plot'])
                 column_names = df.columns.tolist()
                 color = st.selectbox('Selct The Axis To be The Label/color', ['None'] + column_names)
-                with st.expander('Plot with two columns'):
+                with st.expander('Plot Values'):
                     column_names = df.columns.tolist()
+                    st.markdown('Pick None In Y For 1d Plots')
                     ap = st.selectbox('Pick x', column_names)
-                    bp = st.selectbox('Pick y', column_names)
-                    if check([ap,bp,plot_type,color], 9):
-                        plot(ap,bp,color)
+                    bp = st.selectbox('Pick y', column_names + ['None'])
+                    if st.button('Submit '):
+                        if plot_type == 'Map Plot':
+                            st.toast('Please Use Map Section To plot on Map')
+                        elif plot_type in ['Histogram Plot (1d)', 'Box Plot (1d)'] and bp != 'None':
+                            st.toast('Please Pick None For Y if You are Doing a 1d plot')
+                        elif plot_type not in ['Histogram Plot (1d)', 'Box Plot (1d)'] and bp == 'None':
+                            st.toast('Please Pick X and Y for 2d Plot')
+                        else:
+                            plot(ap,bp,color)
+                with st.expander('Plot On Map'):
+                    ap = st.selectbox('Pick Latitude', column_names)
+                    bp = st.selectbox('Pick Longtitude', column_names)
+                    if st.button('Submit'):
+                        if plot_type == 'Map Plot':
+                            if not bp or not ap:
+                                st.toast('Please Pick Latitude AND Longtitude')
+                            else:
+                                plot(ap,bp,color)
+                        else:
+                            st.toast('Please Pick Map Plot To Plot On Map')
                     
             st.link_button("Learn How To Use Amai", 'https://www.youtube.com/watch?v=9zrbpNRHqqA')  
 
@@ -344,6 +374,8 @@ def main():
 
     #Reading Correct Format Of File, and initialization
     df = read_file(file)
+    con = db.connect()
+    con.register("df", df)
     row,col = df.shape
     tab1,tab2,tab3    = st.tabs(['Data', 'Summurized Data','Plotted Data'])
 
@@ -388,10 +420,6 @@ def main():
 
 
 
-
-
-
-
 #Title
 st.markdown(
      """
@@ -405,8 +433,10 @@ st.markdown(
 file = st.file_uploader("Please Upload A Csv/Xlsx File", type=['xlsx', 'csv'])
 password = st.text_input('Please Write Your Password If Your File Has A password', type='password', key='password_input')
 if file:
-    main()
+    try:
+        main()
+    except Exception as e:
+        st.warning(f'Something Went Wrong! Please Try Again {e}')
 else:
     st.warning('Please Upload A csv/xlsx File Under 200 Mb')
     st.stop()
-
