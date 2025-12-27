@@ -328,7 +328,7 @@ def main():
                                 case 'Map Plot':
                                     df[a] = df[a].apply(lambda x: float(x))
                                     df[b] = df[b].apply(lambda x: float(x))
-                                    fig = px.scatter_map(df,lat=b,lon=a,zoom=1)
+                                    fig = px.scatter_map(df,lat=a,lon=b,zoom=1)
                         fig.update_layout(
                         title=f"{plot_type}",
                         xaxis_title=a,
@@ -440,4 +440,5 @@ if file:
 else:
     st.warning('Please Upload A csv/xlsx File Under 200 Mb')
     st.stop()
+
 
