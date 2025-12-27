@@ -288,6 +288,11 @@ def main():
                 
                 def plot(a,b,c):
                     with tab3:
+                        
+                        if plot_type == 'Map Plot':
+                            df[a] = pd.to_numeric(df[a], errors='coerce')
+                            df[b] = pd.to_numeric(df[b], errors='coerce')
+                            
                         if color != 'None':
                             match plot_type:
                                 case 'line plot (2d)':
@@ -305,8 +310,6 @@ def main():
                                 case 'Box Plot (1d)':
                                     fig = px.box(df, x=a,color=c)
                                 case 'Map Plot':
-                                    df[a] = df[a].apply(lambda x: float(x))
-                                    df[b] = df[b].apply(lambda x: float(x))
                                     fig = px.scatter_map(df,lat=a,lon=b,zoom=1,color=c)
 
                         else:
@@ -326,8 +329,6 @@ def main():
                                 case 'Box Plot (1d)':
                                     fig = px.box(df, x=a)
                                 case 'Map Plot':
-                                    df[a] = df[a].apply(lambda x: float(x))
-                                    df[b] = df[b].apply(lambda x: float(x))
                                     fig = px.scatter_map(df,lat=a,lon=b,zoom=1)
                         fig.update_layout(
                         title=f"{plot_type}",
@@ -440,5 +441,6 @@ if file:
 else:
     st.warning('Please Upload A csv/xlsx File Under 200 Mb')
     st.stop()
+
 
 
