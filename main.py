@@ -292,6 +292,7 @@ def main():
                         if plot_type == 'Map Plot':
                             df[a] = pd.to_numeric(df[a], errors='coerce')
                             df[b] = pd.to_numeric(df[b], errors='coerce')
+                            df_map = df.dropna(subset=[a, b]).copy()
                             
                         if color != 'None':
                             match plot_type:
@@ -301,7 +302,7 @@ def main():
                                     fig = px.scatter(df,x=a,y=b,color = c)
                                 case 'bar chart (2d)':
                                     fig = px.bar(df,x=a,y=b,color = c)
-                                case 'Horizantal Bar Chart (2d)':
+                                case 'Horizontal Bar Chart (2d)':
                                     fig = px.bar(df,x=a,y=b,orientation='h',color = c)
                                 case'Stacked Area Plot (2d)':
                                     fig = px.area(df,x=a,y=b,color = c)
@@ -310,7 +311,7 @@ def main():
                                 case 'Box Plot (1d)':
                                     fig = px.box(df, x=a,color=c)
                                 case 'Map Plot':
-                                    fig = px.scatter_map(df,lat=a,lon=b,zoom=1,color=c)
+                                    fig = px.scatter_map(df_map,lat=df_map[a],lon=df_map[b],zoom=1,color=c)
 
                         else:
                             match plot_type:
@@ -329,7 +330,7 @@ def main():
                                 case 'Box Plot (1d)':
                                     fig = px.box(df, x=a)
                                 case 'Map Plot':
-                                    fig = px.scatter_map(df,lat=a,lon=b,zoom=1)
+                                    fig = px.scatter_map(df_map,lat=df_map[a],lon=df_map[b],zoom=1)
                         fig.update_layout(
                         title=f"{plot_type}",
                         xaxis_title=a,
@@ -441,6 +442,7 @@ if file:
 else:
     st.warning('Please Upload A csv/xlsx File Under 200 Mb')
     st.stop()
+
 
 
 
