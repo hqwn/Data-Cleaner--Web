@@ -420,8 +420,6 @@ def main():
     #Running everything
     sidebar(df)
 
-
-
 #Title
 st.markdown(
      """
@@ -430,18 +428,45 @@ st.markdown(
      unsafe_allow_html=True
  )
 
+usage,about = st.tabs(['Use the app','About Amai'])
 
-#Start Logic
-file = st.file_uploader("Please Upload A Csv/Xlsx File", type=['xlsx', 'csv'])
-password = st.text_input('Please Write Your Password If Your File Has A password', type='password', key='password_input')
-if file:
-    try:
-        main()
-    except Exception as e:
-        st.warning(f'Something Went Wrong! Please Try Again {e}')
-else:
-    st.warning('Please Upload A csv/xlsx File Under 200 Mb')
-    st.stop()
+with about:
+    st.markdown(
+        """
+        ## About Amai
+        Amai is a data cleaning web application built using Streamlit and Pandas. It allows users to upload CSV or Excel files, perform various data cleaning operations, and visualize the cleaned data through different types of plots.
+
+        ### Features:
+        - Upload CSV or Excel files (with optional password protection)
+        - Rename columns
+        - Create new columns using mathematical operations
+        - Drop unnecessary columns
+        - Handle missing values (replace, remove)
+        - Sort data
+        - Shuffle data for anonymization
+        - Filter data based on conditions
+        - Format columns (capitalize, phone format, remove extra spaces)
+        - Plot data using various chart types (line, scatter, bar, histogram, box plot, map)
+        - Download cleaned data as CSV
+
+        Amai aims to simplify the data cleaning process and make it accessible to users without extensive programming knowledge.
+        """
+    )
+    st.link_button("Learn How To Use Amai", 'https://www.youtube.com/watch?v=9zrbpNRHqqA')  
+
+with usage:
+    #Start Logic
+    file = st.file_uploader("Please Upload A Csv/Xlsx File", type=['xlsx', 'csv'])
+    password = st.text_input('Please Write Your Password If Your File Has A password', type='password', key='password_input')
+    if file:
+        try:
+            main()
+        except Exception as e:
+            st.warning(f'Something Went Wrong! Please Try Again {e}')
+    else:
+        st.warning('Please Upload A csv/xlsx File Under 200 Mb')
+        st.stop()
+    
 
 
 
