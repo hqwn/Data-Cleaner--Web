@@ -8,7 +8,6 @@ import matplotlib.pyplot as plt
 import plotly_express as px
 import io
 import msoffcrypto
-import duckdb as db
 
 
 #Main Code/Scroll down to see start logic
@@ -171,18 +170,15 @@ def main():
                     c1 = st.checkbox('Remove Rows With Missing Value')
                     c2 = st.checkbox('Remove Columns With Missing Value')
                     
-                    if c2 and c1:
-                        st.toast('You can only have one checkbox picked at once')
-                    elif c1 or c2:
-                        if [c1,c2] != st.session_state.widgets[7]:
-                            st.session_state.widgets[7] = [c1,c2]
-                            if c1:
-                                df = df.dropna()
-                                update(df)
-
-                            if c2:
-                                df = df.dropna(axis=1)
-                                update(df)
+                    submits = st.button('Format')
+                    if c1 and c2 and submits:
+                        st.toast('Please Pick One checkbox At A Time')
+                    elif c1 and submits:
+                        df = df.dropna()
+                        update(df)
+                    elif c2 and submits:
+                        df = df.dropna(axis=1)
+                        update(df)
                 with st.expander('Replace string in column with x'):
                     #replacing string with another string 
 
@@ -216,7 +212,7 @@ def main():
 
 
 
-            with st.expander('Encryption For Sensetive Data'):
+            with st.expander('Shuffle data'):
                 #shuffling data
                 with st.expander('Shuffle Data'):
                     pop = st.toggle('Shuffle Data')
@@ -234,47 +230,55 @@ def main():
                     col6,col7 = st.columns(2)
                     j = col6.selectbox('Pick operartion', options=['>', '<', '=', 'not = to'])
                     k = col7.text_input('Write the comparison')
-                    if check([li,j,k], 6):
-                        match j:
-                            case '>':
-                                df = con.sql(f'''Select * From df WHERE {li}>{int(k)}''')           
-                            case '<':
-                                df = con.sql(f'''Select * From df WHERE {li}<{int(k)}''') 
-                            case '=':
-                                try:
-                                    df = con.sql(f'''Select * From df WHERE {li}={int(k)}''') 
-                                except:
-                                    df = con.sql(f'''Select * From df WHERE {li}={str(k)}''') 
-                            case 'not = to':
-                                try:
-                                    df = con.sql(f'''Select * From df WHERE {li}!={int(k)}''') 
-                                except:
-                                    df = con.sql(f'''Select * From df WHERE {li}!={str(k)}''') 
-                            
+                    if check([li,j,k], 6) and k is not None:
+                        try:
+                            val = float(k)
+                            numeric = True
+                        except ValueError:
+                            val = k  
+                            numeric = False
+
+                        if numeric:
+                            if j == '>':
+                                df = df[pd.to_numeric(df[li], errors='coerce') > val]
+                            elif j == '<':
+                                df = df[pd.to_numeric(df[li], errors='coerce') < val]
+                            elif j == '=':
+                                df = df[pd.to_numeric(df[li], errors='coerce') == val]
+                            elif j == 'not = to':
+                                df = df[pd.to_numeric(df[li], errors='coerce') != val]
+                        else:
+                            if j == '=':
+                                df = df[df[li] == val]
+                            elif j == 'not = to':
+                                df = df[df[li] != val]
+                            else:
+                                st.toast("Cannot use '<' or '>' with text")
                         update(df)
                 with st.expander('Format Columns'):
                     #formating columns
                     column_names = df.columns.tolist()
                     sanji= st.selectbox('Pick what to do', ['Capitalize', 'Phone Format', 'Remove Extra Spaces'])
                     luffy = st.multiselect('Pick columns to format', column_names)
-                    if check([luffy,sanji], 7):
+                    apply_format = st.button('Apply Formatting')
+                    if apply_format and luffy:
                         for i in luffy:
+                            df[i] = df[i].astype(str)
+                            
                             match sanji:
                                 case 'Capitalize':
                                     df[i] = df[i].str.lower().str.capitalize()
                                 case 'Phone Format':
                                     df[i] = df[i].astype(str)
                                     df[i] = df[i].str.replace(r'\D', '', regex=True)
-                                    df[i] = df[i].apply(lambda x: x[0:3] + '-' + x[3:6] + '-' + x[6:10])
-                                    df[i] = df[i].str.replace('nan--','')
-                                    df[i] = df[i].str.replace('Na--','')
-                                    df[i] = df[i].str.replace('NaN--','')
+                                    df[i] = df[i].apply(lambda x: f'{x[0:3]}-{x[3:6]}-{x[6:10]}' if len(x) >= 10 else x)
                                 case 'Remove Extra Spaces':
                                     df[i].apply(lambda x: str(x))
                                     df[i] = df[i].str.strip()
                         update(df)
+                    elif apply_format and not luffy:
+                        st.toast('Please Pick At least One Column And One Format Type')
                 col0,col11 = st.columns(2)
-                summarize = col1.checkbox('')
                 checks = col0.checkbox('Drop Duplicate Rows')
                 if check([checks], 8):
                     #dropping duplicates
@@ -288,12 +292,6 @@ def main():
                 
                 def plot(a,b,c):
                     with tab3:
-                        
-                        if plot_type == 'Map Plot':
-                            df[a] = pd.to_numeric(df[a], errors='coerce')
-                            df[b] = pd.to_numeric(df[b], errors='coerce')
-                            df_map = df.dropna(subset=[a, b]).copy()
-                            
                         if color != 'None':
                             match plot_type:
                                 case 'line plot (2d)':
@@ -302,7 +300,7 @@ def main():
                                     fig = px.scatter(df,x=a,y=b,color = c)
                                 case 'bar chart (2d)':
                                     fig = px.bar(df,x=a,y=b,color = c)
-                                case 'Horizontal Bar Chart (2d)':
+                                case 'Horizantal Bar Chart (2d)':
                                     fig = px.bar(df,x=a,y=b,orientation='h',color = c)
                                 case'Stacked Area Plot (2d)':
                                     fig = px.area(df,x=a,y=b,color = c)
@@ -311,7 +309,9 @@ def main():
                                 case 'Box Plot (1d)':
                                     fig = px.box(df, x=a,color=c)
                                 case 'Map Plot':
-                                    fig = px.scatter_map(df_map,lat=df_map[a],lon=df_map[b],zoom=1,color=c)
+                                    df[a] = df[a].apply(lambda x: float(x))
+                                    df[b] = df[b].apply(lambda x: float(x))
+                                    fig = px.scatter_map(df,lat=a,lon=b,zoom=1,color=c)
 
                         else:
                             match plot_type:
@@ -330,7 +330,9 @@ def main():
                                 case 'Box Plot (1d)':
                                     fig = px.box(df, x=a)
                                 case 'Map Plot':
-                                    fig = px.scatter_map(df_map,lat=df_map[a],lon=df_map[b],zoom=1)
+                                    df[a] = df[a].apply(lambda x: float(x))
+                                    df[b] = df[b].apply(lambda x: float(x))
+                                    fig = px.scatter_map(df,lat=a,lon=b,zoom=1)
                         fig.update_layout(
                         title=f"{plot_type}",
                         xaxis_title=a,
@@ -376,8 +378,6 @@ def main():
 
     #Reading Correct Format Of File, and initialization
     df = read_file(file)
-    con = db.connect()
-    con.register("df", df)
     row,col = df.shape
     tab1,tab2,tab3    = st.tabs(['Data', 'Summurized Data','Plotted Data'])
 
@@ -419,6 +419,8 @@ def main():
     tab2.data_editor(df.describe(include='all'))
     #Running everything
     sidebar(df)
+
+
 
 #Title
 st.markdown(
@@ -466,8 +468,3 @@ with usage:
     else:
         st.warning('Please Upload A csv/xlsx File Under 200 Mb')
         st.stop()
-    
-
-
-
-
