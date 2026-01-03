@@ -11,9 +11,9 @@ import msoffcrypto
 
 
 #Main Code/Scroll down to see start logic
-def main():
+def main(file):
     #file reading logic
-    @st.cache_resource
+    @st.cache_data(show_spinner=False)
     def read_file(file):
         if password and file:
                 office_file = msoffcrypto.OfficeFile(file)
@@ -382,13 +382,13 @@ def main():
     tab1,tab2,tab3    = st.tabs(['Data', 'Summurized Data','Plotted Data'])
 
     #initillazing session state
-    if 'show' not in st.session_state:
+    if 'show' not in st.session_state or st.session_state.show is None:
         st.session_state.show = df
-    if 'og' not in st.session_state:
+    if 'og' not in st.session_state or st.session_state.og is None:
         st.session_state.og = df
-    if 'commit' not in st.session_state:
+    if 'commit' not in st.session_state or st.session_state.commit is None:
         st.session_state.commit = df
-    if 'widgets' not in st.session_state:
+    if 'widgets' not in st.session_state or st.session_state.widgets is None:
         st.session_state.widgets = [None] * 15
     #buttons
     cola,colb,colc,cold = st.columns([1,2,1,2])
@@ -409,11 +409,12 @@ def main():
         df = st.session_state.og
         st.rerun()
     csv = df.to_csv(index=False).encode('utf-8')
-    if cold.download_button(label="Download Cleaned CSV",data=csv,file_name='cleaned_data.csv',mime='text/csv'):
-         st.balloons()
+    with cold.expander('Download Cleaned Data'):
+        Name = st.text_input('File name of your choice (without extension and press enter)', value='cleaned_data', key='filename_input')
+        if st.download_button(label="Download Cleaned CSV",data=csv,file_name=f'{Name}.csv',mime='text/csv'):
+            st.balloons()
     if st.button('Clear Cache(RECOMENDED TO USE RIGHT BEFORE EXITING)'):
         st.cache_data.clear()
-        st.cache_resource.clear()
         st.rerun()
     df = tab1.data_editor(st.session_state.show, num_rows="dynamic")
     tab2.data_editor(df.describe(include='all'))
@@ -461,8 +462,15 @@ with usage:
     file = st.file_uploader("Please Upload A Csv/Xlsx File", type=['xlsx', 'csv'])
     password = st.text_input('Please Write Your Password If Your File Has A password', type='password', key='password_input')
     if file:
+        if st.session_state.get("file") != (file.name, file.size):
+            st.session_state["file"] = (file.name, file.size)
+            st.session_state.widgets = None  
+            st.session_state.commit = None
+            st.session_state.show = None
+            st.session_state.og = None
+            st.cache_data.clear()
         try:
-            main()
+            main(file)
         except Exception as e:
             st.warning(f'Something Went Wrong! Please Try Again {e}')
     else:
