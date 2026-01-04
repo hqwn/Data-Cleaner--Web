@@ -379,7 +379,7 @@ def main(file):
         new_filename = st.text_input('Filename of your choice (without extension and press enter)', value='cleaned_data')
         with st.spinner('Preparing your download...'):
             st.download_button(label="Download Cleaned CSV", data=csv, file_name=f'{new_filename}.csv', mime='text/csv')
-        st.balloons()
+            st.balloons()
 
 
     #Reading Correct Format Of File, and initialization
@@ -480,4 +480,5 @@ with usage:
     else:
         st.warning('Please Upload A csv/xlsx File Under 200 Mb')
         st.stop()
+
 
