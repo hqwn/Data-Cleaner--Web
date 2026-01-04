@@ -1,6 +1,7 @@
 
 
 #imports 
+import os
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -8,6 +9,8 @@ import matplotlib.pyplot as plt
 import plotly_express as px
 import io
 import msoffcrypto
+import time
+from ollama import Client
 
 
 #Main Code/Scroll down to see start logic
@@ -372,20 +375,50 @@ def main(file):
                     
             st.link_button("Learn How To Use Amai", 'https://www.youtube.com/watch?v=9zrbpNRHqqA')  
 
+            
 
     #Download dialog
     @st.dialog('Download Cleaned Data')
     def download_dialog():
         new_filename = st.text_input('Filename of your choice (without extension and press enter)', value='cleaned_data')
         with st.spinner('Preparing your download...'):
-            st.download_button(label="Download Cleaned CSV", data=csv, file_name=f'{new_filename}.csv', mime='text/csv')
-            st.balloons()
+            if st.download_button(label="Download Cleaned CSV", data=csv, file_name=f'{new_filename}.csv', mime='text/csv'):
+                st.balloons()
 
 
     #Reading Correct Format Of File, and initialization
     df = read_file(file)
     row,col = df.shape
-    tab1,tab2,tab3    = st.tabs(['Data', 'Summurized Data','Plotted Data'])
+    tab1,tab2,tab3,tab4 = st.tabs(['Data', 'Summurized Data','Plotted Data', 'Chat with Amai Ai(Beta)'])
+    with tab4:
+        st.title('Chat with Amai Ai (Beta)')
+
+        st.markdown('This is a beta feature that allows you to chat with an AI about your data that you currently see in the "Data" tab or your most recently commited data. Please note that this feature is still under development and may not work perfectly.')
+
+        if 'chat_history' not in st.session_state:
+            response = ollama_response('Make me an overview of the data so you sound something like this cause this is your opening text, somethign liek "Hello! I am Amai AI, your data assistant. How can I help you with your data today? here is an overview of your data"', st.session_state.commit if st.session_state.commit is not None else df)
+            st.session_state.chat_history = [{"role": "ai", "content": response}]
+            
+        
+        chat_placeholder = st.empty()
+        def display_chat():
+            with chat_placeholder.container():
+                for message in st.session_state.chat_history:
+                    with st.chat_message(message["role"]):
+                        st.markdown(message["content"])
+        display_chat()
+        if prompt := st.chat_input("Ask me anything about your data!"):
+            # Add user message to chat history
+            st.session_state.chat_history.append({"role": "user", "content": prompt})
+            display_chat()
+            # Generate AI response
+            with st.chat_message("ai"):
+                with st.spinner('Amai AI is thinking...'):
+                    response = ollama_response(prompt, st.session_state.commit if st.session_state.commit is not None else df)
+            st.session_state.chat_history.append({"role": "ai", "content": response})
+            display_chat()
+        
+
 
     #initillazing session state
     if 'show' not in st.session_state or st.session_state.show is None:
@@ -461,6 +494,30 @@ with about:
     )
     st.link_button("Learn How To Use Amai", 'https://www.youtube.com/watch?v=9zrbpNRHqqA')  
 
+
+
+#Ollama AI Integration
+
+client = Client(
+    host="https://ollama.com", 
+    headers={"Authorization": f"Bearer {st.secrets['OLLAMA_KEY']}"}
+)
+def ollama_response(dialogue,df):
+    summary = df.head(100).to_string()
+    conversation = [
+        {"role": "system", "content": "You are a helpful data analyst assistant."},
+        {"role": "user", "content": f"question: {dialogue} Data: {summary}"}
+    ]
+
+    response = client.chat(
+        model="gpt-oss:20b-cloud",
+        messages=conversation
+    )
+
+    return response['message']['content']
+
+
+
 with usage:
     #Start Logic
     file = st.file_uploader("Please Upload A Csv/Xlsx File", type=['xlsx', 'csv'])
@@ -480,5 +537,6 @@ with usage:
     else:
         st.warning('Please Upload A csv/xlsx File Under 200 Mb')
         st.stop()
+
 
 
