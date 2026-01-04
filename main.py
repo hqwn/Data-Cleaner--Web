@@ -373,7 +373,13 @@ def main(file):
             st.link_button("Learn How To Use Amai", 'https://www.youtube.com/watch?v=9zrbpNRHqqA')  
 
 
-
+    #Download dialog
+    @st.dialog('Download Cleaned Data')
+    def download_dialog():
+        new_filename = st.text_input('Filename of your choice (without extension and press enter)', value='cleaned_data')
+        with st.spinner('Preparing your download...'):
+            st.download_button(label="Download Cleaned CSV", data=csv, file_name=f'{new_filename}.csv', mime='text/csv')
+        st.balloons()
 
 
     #Reading Correct Format Of File, and initialization
@@ -409,10 +415,8 @@ def main(file):
         df = st.session_state.og
         st.rerun()
     csv = df.to_csv(index=False).encode('utf-8')
-    with cold.expander('Download Cleaned Data'):
-        Name = st.text_input('File name of your choice (without extension and press enter)', value='cleaned_data', key='filename_input')
-        if st.download_button(label="Download Cleaned CSV",data=csv,file_name=f'{Name}.csv',mime='text/csv'):
-            st.balloons()
+    if cold.button('Download Cleaned Data as csv'):
+        download_dialog()
     if st.button('Clear Cache(RECOMENDED TO USE RIGHT BEFORE EXITING)'):
         st.cache_data.clear()
         st.rerun()
@@ -476,3 +480,4 @@ with usage:
     else:
         st.warning('Please Upload A csv/xlsx File Under 200 Mb')
         st.stop()
+
