@@ -6,3 +6,4 @@ groq
 numpy
 ollama
 plotly_express
+tabulate
