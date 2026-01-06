@@ -1,7 +1,7 @@
 pandas
 streamlit
 plotly
-msoffcrypto
+msoffcrypto-tool
 groq
 numpy
 ollama
