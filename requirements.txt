@@ -5,3 +5,4 @@ msoffcrypto-tool
 groq
 numpy
 ollama
+plotly_express
