@@ -1,8 +1,7 @@
 pandas
 streamlit
-openpyxl
-plotly.express
-matplotlib
-msoffcrypto-tool
-ollama
+plotly
+msoffcrypto
+groq
 numpy
+ollama
