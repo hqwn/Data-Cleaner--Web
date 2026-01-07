@@ -46,12 +46,15 @@ def main(file_widget):
         #Ai models up to use
 
         models = {
-            'Groq GPT-OSS 120B (High Logic, Slower Speed; Aka: Brain)' : 'openai/gpt-oss-120b',
-            'Groq QWEN 3 32B (Balance of Speed and Logic; Aka: Analyst; Recommended)': 'qwen/qwen3-32b',
-            'Groq KIMI-K2 INSTRUCT (Advanced Reasoning); Aka: Researcher': 'moonshotai/kimi-k2-instruct-0905',
+            'Groq GPT-OSS 120B (High Logic; Aka: Brain; Recommended)' : 'openai/gpt-oss-120b',
+            'Groq QWEN 3 32B (Balance of Speed and Logic; Aka: Analyst)': 'qwen/qwen3-32b',
+            'Groq KIMI-K2 INSTRUCT (Advanced Reasoning; Mainly for following instructions rather than data analysis)': 'moonshotai/kimi-k2-instruct-0905',
             'Ollama GPT-OSS 20b (Fast, logical, and follows instructions carefully; Aka: Specialist)': 'gpt-oss:20b-cloud'
         }
-        model_picked = st.selectbox(label='Pick Your Model', options=models.keys())
+        with st.expander('AI settings/tweaks'):
+            model_picked = st.selectbox(label='Pick Your Model', options=models.keys())
+            temperature = st.slider('Creativity vs Factual; 0.1(Most Factual) 0.9(Most creative); 0.5 recommended', min_value=.1, max_value=.9,step=.1,value=.5)
+
         
         if 'chat_history' not in st.session_state or st.session_state.chat_history is None:
             message = '''"Hello! You are Amai AI, a world-class data analyst. Your goal is to welcome the user and provide a high-level executive summary of the data provided.
@@ -64,7 +67,7 @@ def main(file_widget):
                     Data Health: Briefly mention if the data looks clean or if it needs work (e.g., 'I noticed some lowercase names that need capitalizing').'''
             
             response = ''
-            for i in AI.AI_Response(message, df, [model_picked[0], models[model_picked]]):
+            for i in AI.AI_Response(message, df, [model_picked[0], models[model_picked]],temperature):
                 if isinstance(i,str):
                     response += i
                 elif isinstance(i, dict):
@@ -89,7 +92,7 @@ def main(file_widget):
             with chat_placeholder:
                 with st.chat_message("ai",avatar='🧠'):
                     with st.spinner('Amai AI is thinking...'):
-                        response = st.write_stream(AI.AI_Response(prompt, df,[model_picked[0], models[model_picked]]))
+                        response = st.write_stream(AI.AI_Response(prompt, df,[model_picked[0], models[model_picked]],temperature))
             st.session_state.chat_history.append({"role": "ai", "content": response})
     with tab3:
         data = st.empty()
@@ -450,7 +453,7 @@ st.set_page_config(
         'Get Help': 'https://youtu.be/ZZrf9-v7QsA',
         'Report a bug': "https://github.com/hqwn/Data-Cleaner--Web//issues",
         'About': "# Amai AI\nCreated for fast data cleaning and fun :D."
-    }
+    },
 )
 
 
@@ -459,7 +462,7 @@ st.markdown(
      """
      <h1 style='text-align: center;'>Amai 👌👌</h1>
      """,
-     unsafe_allow_html=True
+     unsafe_allow_html=True,
  )
   
 #Tabs
