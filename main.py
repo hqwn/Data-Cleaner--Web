@@ -2,7 +2,7 @@
 import AI
 import Clean_functions as cf
 import streamlit as st
-
+import plotly_express as px
 
 #Main Code/Scroll down to see start logic
 def main(file_widget):
@@ -31,11 +31,29 @@ def main(file_widget):
     DATA = tab1.data_editor(st.session_state.show, num_rows="dynamic", key="data_editor")
     st.session_state.show = DATA
     df = st.session_state.show
-    print(df)
-    tab2.dataframe(df.describe(include='all'))
     row,col = df.shape
     
     #Tabs Init
+    with tab2:
+            
+            summary_type = st.pills('Show correlation or Summary of data', ['Summary','Correlation'],default='Summary')
+            tab2_data = st.empty()
+            if summary_type == 'Summary':
+                tab2_data.dataframe(df.describe(include='all'))
+            elif summary_type == 'Correlation':
+                corr_matrix = df.select_dtypes(include='int').corr()
+
+                fig = px.imshow(
+                    corr_matrix,
+                    text_auto='.3f',
+                    color_continuous_scale='greys',
+                    height=500,
+                    width=500
+                )
+
+                st.plotly_chart(fig)
+            else:
+                tab2_data.write('Pick an Option')
     with tab4:
         #title
         st.title('Chat with Amai Ai (Beta)')
@@ -97,9 +115,6 @@ def main(file_widget):
     with tab3:
         data = st.empty()
         data.markdown('Plot Some data! (It will appear over here)')
-    
-
-        #buttons and dataframe
     
     #Buttons
     column1,column2,column3,column4 = tab1.columns([1,2,1,2])
