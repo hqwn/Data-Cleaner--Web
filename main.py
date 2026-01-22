@@ -476,17 +476,27 @@ st.set_page_config(
 #Google anayltics 
 components.html(
     """
-    <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-YT907KK9QV"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
+
       gtag('js', new Date());
-      gtag('config', 'G-YT907KK9QV');
+
+      gtag('config', 'G-YT907KK9QV', {
+        send_page_view: true,
+        page_title: 'Amai AI',
+        page_location: window.location.href,
+        page_path: window.location.pathname
+      });
+
+      // force page_view event
+      gtag('event', 'page_view');
     </script>
     """,
     height=0,
 )
+
 
 #Title
 st.markdown(
@@ -553,6 +563,7 @@ with usage:
         #Warning if 
         st.warning('Please Upload A csv/xlsx File Under 200 Mb')
         st.stop()
+
 
 
 
