@@ -8,4 +8,5 @@ ollama
 plotly_express
 tabulate
 openpyxl
-altair.vegalite.v4
+altair<5
+
