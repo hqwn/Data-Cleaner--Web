@@ -472,7 +472,7 @@ st.set_page_config(
 )
 
 #google analytics setup
-st.html('<!-- Google tag (gtag.js) -->
+st.html('''<!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-YT907KK9QV"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -480,7 +480,7 @@ st.html('<!-- Google tag (gtag.js) -->
   gtag("js", new Date());
 
   gtag("config", "G-YT907KK9QV");
-</script>')
+</script>''')
 
 
 #Title
@@ -548,6 +548,7 @@ with usage:
         #Warning if 
         st.warning('Please Upload A csv/xlsx File Under 200 Mb')
         st.stop()
+
 
 
 
