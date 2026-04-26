@@ -26,7 +26,7 @@ def main(file_widget):
         st.session_state.widgets = [None] * 15
 
     #Tabs
-    tab1,tab2,tab3,tab4 = st.tabs(['Data', 'Summurized Data','Plotted Data', 'Chat with Amai Ai(Beta)'])
+    tab1,tab2,tab3,tab4 = st.tabs(['Data', 'Summarized Data','Plotted Data', 'Chat with Amai AI (Beta)'])
     
     #Data frame
     DATA = tab1.data_editor(st.session_state.show, num_rows="dynamic", key="data_editor")
@@ -57,10 +57,10 @@ def main(file_widget):
                 tab2_data.write('Pick an Option')
     with tab4:
         #title
-        st.title('Chat with Amai Ai (Beta)')
+        st.title('Chat with Amai AI (Beta)')
 
         #explanation
-        st.markdown('This is a beta feature that allows you to chat with an Groq Ai model or an Ollama Cloud model of your choice. This AI will reference the first 20 rows of your data and summary of your data')
+        st.markdown('This is a beta feature that allows you to chat with a Groq AI model or an Ollama Cloud model of your choice. This AI will reference the first 20 rows of your data and summary of your data')
 
         #Ai models up to use
 
@@ -142,7 +142,7 @@ def main(file_widget):
     if column4.button('Download Cleaned Data as csv'):
         download_dialog()
     #Button to clear cache
-    if tab1.button('Clear Cache(RECOMENDED TO USE RIGHT BEFORE EXITING)'):
+    if tab1.button('Clear Cache(RECOMMENDED TO USE RIGHT BEFORE EXITING)'):
         st.cache_data.clear()
         st.rerun()
 
@@ -156,8 +156,8 @@ def main(file_widget):
     @st.fragment
     def sidebar():
 
-        #SideBar Full of customiziation
-        #Refrencing df
+        #SideBar Full of customization
+        #Referencing df
         df = st.session_state.show
 
         #Sidebar Title
@@ -417,9 +417,9 @@ def main(file_widget):
                         st.toast(f'Something went Wrong, {e}, Try reselecting values, and color if you had one')
 
 
-            plot_type = st.selectbox('Selct The Type Of Chart You Want', ['line plot (2d)', 'scatter plot (2d)', 'bar chart (2d)', 'Horizantal Bar Chart (2d)', 'Stacked Area Plot (2d)', 'Histogram Plot (1d)', 'Box Plot (1d)', 'Map Plot'])
+            plot_type = st.selectbox('Select The Type Of Chart You Want', ['line plot (2d)', 'scatter plot (2d)', 'bar chart (2d)', 'Horizontal Bar Chart (2d)', 'Stacked Area Plot (2d)', 'Histogram Plot (1d)', 'Box Plot (1d)', 'Map Plot'])
             column_names = df.columns.tolist()
-            color = st.selectbox('Selct The Axis To be The Label/color', ['None'] + column_names)
+            color = st.selectbox('Select The Axis To be The Label/color', ['None'] + column_names)
             
             #picking values
             with st.expander('Plot Values'):
@@ -442,7 +442,7 @@ def main(file_widget):
             with st.expander('Plot On Map'):
             
                 lat = st.selectbox('Pick Latitude', column_names)
-                lon = st.selectbox('Pick Longtitude', column_names)
+                lon = st.selectbox('Pick Longitude', column_names)
                 
                 if st.button('Submit  Map'):
                     if plot_type == 'Map Plot':
@@ -473,7 +473,7 @@ st.set_page_config(
 )
 
 
-#Google anayltics 
+#Google analytics 
 components.html(
     """
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-YT907KK9QV"></script>

@@ -34,7 +34,7 @@ def AI_Response(dialogue,df,model,temp):
                     {summary}, 
                     
                     
-                    summuray of full dataset: 
+                    summary of full dataset: 
                     
                     
                     {describe}"""
