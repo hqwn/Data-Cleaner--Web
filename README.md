@@ -2,6 +2,7 @@
 
 > A fast, browser-based data cleaning and visualization workspace powered by Streamlit, Pandas, and AI.
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-datacleanser.streamlit.app-FF4B4B?logo=streamlit&logoColor=white)](https://datacleanser.streamlit.app)
 [![Streamlit](https://img.shields.io/badge/built%20with-Streamlit-FF4B4B?logo=streamlit&logoColor=white)](https://streamlit.io)
 [![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)](https://python.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
@@ -11,16 +12,16 @@
 ## 📸 Screenshots
 
 ### Data Table & Sidebar Controls
-![Data table view with sidebar](https://github.com/user-attachments/assets/26d1405b-f586-499f-a783-bc70f85bfe22)
+![Data table view with sidebar](images/data-table-sidebar.png)
 
 ### Summarized Data — Correlation Matrix
-![Correlation heatmap](https://github.com/user-attachments/assets/67b42f4e-2cd0-4857-97a1-e4cdee719c98)
+![Correlation heatmap](images/correlation-heatmap.png)
 
 ### Interactive Data Plotting
-![Scatter plot of HP vs Attack](https://github.com/user-attachments/assets/f557bf48-307c-45f1-8ee4-16a039558f76)
+![Scatter plot of HP vs Attack](images/scatter-plot.png)
 
 ### Amai AI Chat
-![AI chat panel](https://github.com/user-attachments/assets/31d02911-fdda-43a6-97e3-f121c0247057)
+![AI chat panel](images/amai-ai-chat.png)
 
 ---
 
