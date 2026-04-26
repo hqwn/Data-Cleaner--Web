@@ -9,33 +9,33 @@
 
 ---
 
-## 📸 Screenshots
+## Screenshots
 
 ### Data Table & Sidebar Controls
-![Data table view with sidebar](images/data-table-sidebar.png)
+![Data table view with sidebar](https://github.com/user-attachments/assets/26d1405b-f586-499f-a783-bc70f85bfe22)
 
 ### Summarized Data — Correlation Matrix
-![Correlation heatmap](images/correlation-heatmap.png)
+![Correlation heatmap](https://github.com/user-attachments/assets/67b42f4e-2cd0-4857-97a1-e4cdee719c98)
 
 ### Interactive Data Plotting
-![Scatter plot of HP vs Attack](images/scatter-plot.png)
+![Scatter plot of HP vs Attack](https://github.com/user-attachments/assets/f557bf48-307c-45f1-8ee4-16a039558f76)
 
 ### Amai AI Chat
-![AI chat panel](images/amai-ai-chat.png)
+![AI chat panel](https://github.com/user-attachments/assets/31d02911-fdda-43a6-97e3-f121c0247057)
 
 ---
 
-## ✨ Features
+## Features
 
-### 📂 File Upload
+### File Upload
 - Upload **CSV** or **Excel (.xlsx)** files up to 200 MB.
 - Optional **password-protected Excel** file support via `msoffcrypto`.
 
-### 🔍 Pick Values To Show
+### Pick Values To Show
 - Show the **first N rows** of your dataset using a slider.
 - Show a **custom row range** (e.g. rows 100–500) using a range slider.
 
-### 🏗️ Column Modification
+### Column Modification
 | Sub-feature | What it does |
 |---|---|
 | **Rename Column** | Pick any column and give it a new name |
@@ -43,27 +43,27 @@
 | **Drop Columns** | Select one or more columns to permanently remove |
 | **Add or Remove Suffix/Prefix** | Batch-add or batch-strip a prefix and/or suffix on any set of columns |
 
-### 🔧 Values Modification
+### Values Modification
 | Sub-feature | What it does |
 |---|---|
 | **Replace Empty Values** | Fill `NaN` / blank cells in selected columns with a custom value |
 | **Remove Rows/Columns with Missing Values** | Drop all rows **or** all columns that contain at least one `NaN` |
 | **Replace String in Column** | Find-and-replace any text (case-sensitive) across one or more columns |
 
-### 🔀 Sorting
+### Sorting
 - Sort the entire dataset **ascending** or **descending** by any column.
 
-### 🎲 Shuffle Data
+### Shuffle Data
 - Randomly shuffle all rows (useful for anonymization or ML dataset preparation).
 
-### ⚙️ Extras
+### Extras
 | Sub-feature | What it does |
 |---|---|
 | **Filter** | Keep only rows where a column satisfies `>`, `<`, `=`, or `≠` a given value (works for both numbers and text) |
 | **Format Columns** | Apply **Capitalize**, **Phone Format** (`xxx-xxx-xxxx`), or **Remove Extra Spaces** to selected columns |
 | **Drop Duplicate Rows** | Remove all exact duplicate rows in one click |
 
-### 📊 Plot Your Data
+### Plot Your Data
 Choose from **8 chart types**, all rendered with Plotly:
 
 | Chart | Dimensions |
@@ -80,12 +80,12 @@ Choose from **8 chart types**, all rendered with Plotly:
 - Select any column as the **color/label** axis for categorical grouping.
 - For map plots, pick dedicated **latitude** and **longitude** columns.
 
-### 📋 Summarized Data
+### Summarized Data
 Switch between two views:
 - **Summary** — pandas `describe()` table covering count, mean, std, min, quartiles, and max for every column.
 - **Correlation** — interactive grayscale **heatmap** of numeric column correlations (Pearson), built with Plotly.
 
-### 🤖 Chat with Amai AI *(Beta)*
+### Chat with Amai AI *(Beta)*
 An AI assistant that reads the first 20 rows and a full statistical summary of your dataset and answers natural-language questions about it.
 
 **Available models:**
@@ -101,7 +101,7 @@ An AI assistant that reads the first 20 rows and a full statistical summary of y
 - On first load, Amai automatically generates a **high-level executive summary** of your data.
 - Full **chat history** is preserved during the session.
 
-### 💾 Session Controls
+### Session Controls
 
 | Button | Action |
 |---|---|
@@ -113,7 +113,7 @@ An AI assistant that reads the first 20 rows and a full statistical summary of y
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 - Python 3.10 or higher
@@ -147,7 +147,7 @@ Then open [http://localhost:8501](http://localhost:8501) in your browser.
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 | Library | Purpose |
 |---|---|
@@ -163,12 +163,12 @@ Then open [http://localhost:8501](http://localhost:8501) in your browser.
 
 ---
 
-## 📖 Learn More
+## Learn More
 
 Watch the tutorial on YouTube: [**Learn How To Use Amai**](https://youtu.be/ZZrf9-v7QsA)
 
 ---
 
-## 🐛 Reporting Issues
+## Reporting Issues
 
 Found a bug? [Open an issue on GitHub](https://github.com/hqwn/Data-Cleaner--Web/issues).
