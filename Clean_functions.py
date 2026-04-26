@@ -126,7 +126,7 @@ def plotting(val_x,val_y,color,plot_type,df):
             fig = px.scatter(df,**kwargs)
         case 'bar chart (2d)':
             fig = px.bar(df,**kwargs)
-        case 'Horizantal Bar Chart (2d)':
+        case 'Horizontal Bar Chart (2d)':
             fig = px.bar(df,orientation='h',**kwargs)
         case'Stacked Area Plot (2d)':
             fig = px.area(df,**kwargs)
